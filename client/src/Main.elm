@@ -66,7 +66,7 @@ init : flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ key =
     ( { songs = Loading, key = key }, get_all_songs )
 
--- get_all_songs : Cmd msg 
+get_all_songs : Cmd Msg 
 get_all_songs = Http.get {url = "/api/v1/songs", expect = Http.expectJson (RemoteData.fromResult >> GotAllSongs) (D.list song_decoder)}
 
 song_decoder : Decoder Song 
