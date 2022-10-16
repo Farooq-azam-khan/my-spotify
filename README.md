@@ -1,5 +1,13 @@
 # my-spotify
 
+## TODO
+* [] only artist can create a song 
+* [] user / artist sign up
+* [] user / artist sign out  
+* [] user / artist sign in 
+* [] user create playlist 
+* [] artist create playlist  
+
 ## Tech Stack 
 * vite 
 * elm lang
