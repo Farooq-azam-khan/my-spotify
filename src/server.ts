@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3001
 
 app.use(express.json())
 
-app.get('/songs', async (req: Request, res: Response) => {
+app.get('/api/v1/songs', async (req: Request, res: Response) => {
     const songs = await prisma.song.findMany()
     return res.status(200).json(songs)
 })
