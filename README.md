@@ -1,5 +1,8 @@
 # my-spotify
 
+* start script: `nodemon --exec node --loader ts-node/esm src/server.ts`
+    - `node dist/server.js`
+    
 ## TODO
 * [] only artist can create a song 
 * [] user / artist sign up
