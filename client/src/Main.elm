@@ -3,18 +3,22 @@ module Main exposing (main)
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
-import Html.Attributes exposing (alt, class, href, src, target)
+import Html.Attributes exposing (..)
+import RemoteData exposing (RemoteData(..), WebData)
 import Html.Events exposing (onClick)
+import Http
 import Url exposing (Url)
+import Json.Decode as D exposing (Decoder)
 
+type alias Song = { id: String, name: String }
 
 type alias Model =
-    { count : Int, key : Nav.Key }
+    { songs : WebData (List Song), key : Nav.Key }
+
 
 
 type Msg
-    = Increment
-    | Decrement
+    = GotAllSongs (RemoteData.WebData (List Song)) 
     | ChangedUrl Url
     | ClickedLink Browser.UrlRequest
 
@@ -25,9 +29,11 @@ view model =
     , body =
         [ div
             [ class "mx-5 sm:mx-0 sm:mx-auto lg sm:max-w-xl lg:max-w-3xl mt-10 space-x-10" ]
-            [ button [ class "bg-black px-5 py-1 text-white rounded-md", onClick Decrement ] [ text "-" ]
-            , span [] [ model.count |> String.fromInt |> text ]
-            , button [ class "bg-black px-5 py-1 text-white rounded-md", onClick Increment ] [ text "+" ]
+            [ case model.songs of 
+                Success songs -> 
+                    ul [] (List.map (\song -> li [] [text song.name]) songs)
+                _ -> 
+                    div [] [text "error, loading, or not asked"]
             ]
         ]
     }
@@ -36,13 +42,10 @@ view model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increment ->
-            ( { model | count = model.count + 1 }, Cmd.none )
+        GotAllSongs web_data_song -> 
+            ({model | songs = web_data_song}, Cmd.none)
 
-        Decrement ->
-            ( { model | count = model.count - 1 }, Cmd.none )
-
-        ChangedUrl url ->
+        ChangedUrl _ ->
             ( model, Cmd.none )
 
         ClickedLink urlRequest ->
@@ -60,9 +63,14 @@ subscriptions _ =
 
 
 init : flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ url key =
-    ( { count = 0, key = key }, Cmd.none )
+init _ _ key =
+    ( { songs = Loading, key = key }, get_all_songs )
 
+-- get_all_songs : Cmd msg 
+get_all_songs = Http.get {url = "/api/v1/songs", expect = Http.expectJson (RemoteData.fromResult >> GotAllSongs) (D.list song_decoder)}
+
+song_decoder : Decoder Song 
+song_decoder = D.map2 Song (D.field "id" D.string) (D.field "name" D.string)
 
 main : Program () Model Msg
 main =
