@@ -3,10 +3,11 @@ import createError from 'http-errors'
 import dotenv from 'dotenv'
 
 dotenv.config()
-const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
-if (accessTokenSecret === undefined) {
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || "its dev who cares"
+/*if (accessTokenSecret === undefined) {
+    console.log(  accessTokenSecret )
     throw new Error('ACCESS_TOKEN_SECRET is not defined')
-}
+}*/
 
 export function signAccessToken(payload: any) {
     return new Promise((resolve, reject) => {
